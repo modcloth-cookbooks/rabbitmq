@@ -27,6 +27,9 @@ default['rabbitmq']['default_pass'] = 'guest'
 default['rabbitmq']['execute_retries'] = 0
 default['rabbitmq']['execute_retry_delay'] = 2
 
+# bind erlang networking to localhost
+default['rabbitmq']['local_erl_netowrking'] = false
+
 #clustering
 default['rabbitmq']['cluster'] = false
 default['rabbitmq']['cluster_disk_nodes'] = []
