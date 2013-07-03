@@ -85,6 +85,7 @@ when 'smartos'
   default['rabbitmq']['service_name'] = 'rabbitmq'
   default['rabbitmq']['config_root'] = '/opt/local/etc/rabbitmq'
   default['rabbitmq']['config'] = '/opt/local/etc/rabbitmq/rabbitmq'
+  default['rabbitmq']['mnesiadir'] = '/var/db/rabbitmq/mnesia'
   default['rabbitmq']['erlang_cookie_path'] = '/var/db/rabbitmq/.erlang.cookie'
 end
 

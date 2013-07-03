@@ -167,6 +167,18 @@ else
   existing_erlang_key = ''
 end
 
+file '/root/.erlang.cookie' do
+  content File.read(node['rabbitmq']['erlang_cookie_path'])
+  user 'root'
+  group  'root'
+  mode 0600
+
+  only_if do
+    platform?('smartos') &&
+      File.exists?(node['rabbitmq']['erlang_cookie_path'])
+  end
+end
+
 if node['rabbitmq']['cluster'] && (node['rabbitmq']['erlang_cookie'] != existing_erlang_key)
   log "stopping service[#{node['rabbitmq']['service_name']}] to change erlang_cookie" do
     level :info
