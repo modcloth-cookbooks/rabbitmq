@@ -163,24 +163,33 @@ end
 
 if ::File.exists?(node['rabbitmq']['erlang_cookie_path'])
   existing_erlang_key = File.read(node['rabbitmq']['erlang_cookie_path'])
-
-  file '/root/.erlang.cookie' do
-    content ::File.read(node['rabbitmq']['erlang_cookie_path'])
-    user 'root'
-    group  'root'
-    mode 0600
-
-    only_if { platform?('smartos') }
-  end
-
 else
   existing_erlang_key = ''
+end
+
+template '/root/.erlang.cookie' do
+  source 'doterlang.cookie.erb'
+  user 'root'
+  group  'root'
+  mode 00400
+  only_if do
+    node['rabbitmq']['erlang_cookie'] != 'NOTSET' &&
+      platform?('smartos')
+  end
 end
 
 if node['rabbitmq']['cluster'] && (node['rabbitmq']['erlang_cookie'] != existing_erlang_key)
   log "stopping service[#{node['rabbitmq']['service_name']}] to change erlang_cookie" do
     level :info
     notifies :stop, "service[#{node['rabbitmq']['service_name']}]", :immediately
+  end
+
+  # Need to reset for clustering #
+  execute "reset-node" do
+    retries node['rabbitmq']['cluster_restart_retries']
+    retry_delay node['rabbitmq']['cluster_restart_retry_delay']
+    command "rabbitmqctl stop_app && rabbitmqctl reset && rabbitmqctl start_app"
+    action :nothing
   end
 
   template node['rabbitmq']['erlang_cookie_path'] do
@@ -190,11 +199,5 @@ if node['rabbitmq']['cluster'] && (node['rabbitmq']['erlang_cookie'] != existing
     mode 00400
     notifies :start, "service[#{node['rabbitmq']['service_name']}]", :immediately
     notifies :run, "execute[reset-node]", :immediately
-  end
-
-  # Need to reset for clustering #
-  execute "reset-node" do
-    command "rabbitmqctl stop_app && rabbitmqctl reset && rabbitmqctl start_app"
-    action :nothing
   end
 end
