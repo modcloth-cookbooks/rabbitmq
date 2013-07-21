@@ -71,10 +71,12 @@ default['rabbitmq']['virtualhosts'] = []
 default['rabbitmq']['disabled_virtualhosts'] = []
 
 #users
-default['rabbitmq']['enabled_users'] =
-  [{ :name => "guest", :password => "guest", :rights =>
-    [{:vhost => nil , :conf => ".*", :write => ".*", :read => ".*"}]
-  }]
+# e.g.
+#  default['rabbitmq']['enabled_users'] =
+#    [{ :name => "guest", :password => "guest", :rights =>
+#      [{:vhost => nil , :conf => ".*", :write => ".*", :read => ".*"}]
+#    }]
+default['rabbitmq']['enabled_users'] = []
 default['rabbitmq']['disabled_users'] =[]
 
 #plugins
