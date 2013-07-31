@@ -45,6 +45,7 @@ default['rabbitmq']['cluster_partition_handling'] = 'ignore'
 default['rabbitmq']['disk_free_limit_relative'] = nil
 default['rabbitmq']['vm_memory_high_watermark'] = nil
 default['rabbitmq']['max_file_descriptors'] = 1024
+default['rabbitmq']['open_file_limit'] = nil
 
 # job control
 default['rabbitmq']['job_control'] = 'initd'
