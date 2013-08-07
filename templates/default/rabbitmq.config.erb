@@ -15,6 +15,7 @@
                     {verify,<%= node['rabbitmq']['ssl_verify'] %>},
                     {fail_if_no_peer_cert,<%= node['rabbitmq']['ssl_fail_if_no_peer_cert'] %>}]},
 <% end %>
+  {cluster_partition_handling, <%= node['rabbitmq']['cluster_partition_handling'] %>},
 <% if node['rabbitmq']['disk_free_limit_relative'] -%>
     {disk_free_limit, {mem_relative, <%= node['rabbitmq']['disk_free_limit_relative'] %>}},
 <% end %>
