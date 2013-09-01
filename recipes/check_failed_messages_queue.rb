@@ -16,7 +16,7 @@
 #
 
 cron "check_failed_messages_queue" do
-  minute '*'
+  minute '00'
   command "/tmp/check_failed_messages_queue.bash"
 end
 
