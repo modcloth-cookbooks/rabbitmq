@@ -1,0 +1,31 @@
+#!/usr/bin/bash
+set -o verbose
+set -x
+whotobug="jritorto@modcloth.com"
+host="$HOSTNAME"
+user="<%= node['rabbitmq']['default_user'] %>"
+pas="<%= node['rabbitmq']['default_pass'] %>"
+port=15672
+baseurl="/api/queues/%2f"
+humanbaseurl="/#/queues/%2f"
+queue="finance_failures"
+header="content-type:application/json"
+url="http://$host:$port$baseurl/$queue"
+humanurl="http://$host:$port$humanbaseurl/$queue"
+wholemess="/tmp/$(date |md5sum |awk '{print $1}')"
+curl -s -i -u $user:$pas -H $header $url >$wholemess
+
+if [ "$?" == "0" ]
+  then
+    nummessages="$(cat $wholemess |json messages)"
+    if [ "$?" == "0" ]
+      then
+        nummessages="$(cat $wholemess |json messages|tail -1)"
+        if [ "$nummessages" != "0" ]
+          then echo "Check it out: $humanurl" |mailx -s  "$nummessages Messages in $queue on $HOSTNAME" $whotobug
+        fi
+      else echo "Please check the $queue queue: $humanurl "|mailx -s "$HOSTNAME's RabbitMQ $queue Check Returned Nonsense" $whotobug
+    fi
+  else echo "$url" |mailx -s "$HOSTNAME Rabbit Monitor Can't Connect to Status Page" $whotobug
+fi
+rm $wholemess
