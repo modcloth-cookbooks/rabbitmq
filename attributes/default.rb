@@ -1,5 +1,5 @@
 # Latest RabbitMQ.com version to install
-default['rabbitmq']['version'] = '3.0.4'
+default['rabbitmq']['version'] = '3.1.5'
 # The distro versions may be more stable and have back-ported patches
 default['rabbitmq']['use_distro_version'] = false
 
@@ -27,6 +27,12 @@ default['rabbitmq']['default_pass'] = 'guest'
 default['rabbitmq']['execute_retries'] = 0
 default['rabbitmq']['execute_retry_delay'] = 2
 
+# bind erlang networking to localhost
+default['rabbitmq']['local_erl_networking'] = false
+
+# bind rabbit and erlang networking to an address
+default['rabbitmq']['erl_networking_bind_address'] = nil
+
 #clustering
 default['rabbitmq']['cluster'] = false
 default['rabbitmq']['cluster_disk_nodes'] = []
@@ -38,6 +44,11 @@ default['rabbitmq']['cluster_partition_handling'] = 'ignore'
 # resource usage
 default['rabbitmq']['disk_free_limit_relative'] = nil
 default['rabbitmq']['vm_memory_high_watermark'] = nil
+default['rabbitmq']['max_file_descriptors'] = 1024
+default['rabbitmq']['open_file_limit'] = nil
+
+# job control
+default['rabbitmq']['job_control'] = 'initd'
 
 #ssl
 default['rabbitmq']['ssl'] = false
@@ -48,8 +59,17 @@ default['rabbitmq']['ssl_key'] = '/path/to/key.pem'
 default['rabbitmq']['ssl_verify'] = 'verify_none'
 default['rabbitmq']['ssl_fail_if_no_peer_cert'] = false
 
+#tcp listen options
+default['rabbitmq']['tcp_listen_packet'] = 'raw'
+default['rabbitmq']['tcp_listen_reuseaddr']  = true
+default['rabbitmq']['tcp_listen_backlog'] = 128
+default['rabbitmq']['tcp_listen_nodelay'] = true
+default['rabbitmq']['tcp_listen_exit_on_close'] = false
+default['rabbitmq']['tcp_listen_keepalive'] = false
+
 #virtualhosts
 default['rabbitmq']['virtualhosts'] = []
+default['rabbitmq']['disabled_virtualhosts'] = []
 
 #users
 # e.g.
@@ -68,7 +88,7 @@ default['rabbitmq']['disabled_plugins'] = []
 case node['platform_family']
 when 'debian'
   default['rabbitmq']['package'] = "https://www.rabbitmq.com/releases/rabbitmq-server/v#{node['rabbitmq']['version']}/rabbitmq-server_#{node['rabbitmq']['version']}-1_all.deb"
-when 'rhel'
+when 'rhel','fedora'
   default['rabbitmq']['package'] = "https://www.rabbitmq.com/releases/rabbitmq-server/v#{node['rabbitmq']['version']}/rabbitmq-server-#{node['rabbitmq']['version']}-1.noarch.rpm"
 when 'smartos'
   default['rabbitmq']['service_name'] = 'rabbitmq'
@@ -81,10 +101,12 @@ when 'smartos'
 end
 
 # Example HA policies
-# default['rabbitmq']['policies']['ha-all']['pattern'] = "^(?!amq\\.).*"
-# default['rabbitmq']['policies']['ha-all']['params'] = { "ha-mode" => "all" }
-# default['rabbitmq']['policies']['ha-all']['priority'] = 0
-#
-# default['rabbitmq']['policies']['ha-two']['pattern'] = "^two\."
-# default['rabbitmq']['policies']['ha-two']['params'] = { "ha-mode" => "exactly", "ha-params" => 2 }
-# default['rabbitmq']['policies']['ha-two']['priority'] = 1
+default['rabbitmq']['policies']['ha-all']['pattern'] = "^(?!amq\\.).*"
+default['rabbitmq']['policies']['ha-all']['params'] = { "ha-mode" => "all" }
+default['rabbitmq']['policies']['ha-all']['priority'] = 0
+
+default['rabbitmq']['policies']['ha-two']['pattern'] = "^two\."
+default['rabbitmq']['policies']['ha-two']['params'] = { "ha-mode" => "exactly", "ha-params" => 2 }
+default['rabbitmq']['policies']['ha-two']['priority'] = 1
+
+default['rabbitmq']['disabled_policies'] = []
