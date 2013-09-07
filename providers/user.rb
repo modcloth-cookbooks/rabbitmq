@@ -89,10 +89,10 @@ action :add do
     # of leaning toothpicks:
     new_password = new_resource.password.gsub("'", "'\\\\''")
     cmdStr = "rabbitmqctl add_user #{new_resource.user} '#{new_password}'"
-    execute cmdStr do
+    execute "rabbitmqctl add_user #{new_resource.user}" do
+      command cmdStr
       retries node['rabbitmq']['execute_retries']
       retry_delay node['rabbitmq']['execute_retry_delay']
-      Chef::Log.debug "rabbitmq_user_add: #{cmdStr}"
       Chef::Log.info "Adding RabbitMQ user '#{new_resource.user}'."
       new_resource.updated_by_last_action(true)
     end
@@ -174,6 +174,17 @@ action :clear_tags do
       retry_delay node['rabbitmq']['execute_retry_delay']
       Chef::Log.debug "rabbitmq_user_clear_tags: #{cmdStr}"
       Chef::Log.info "Clearing RabbitMQ user '#{new_resource.user}' tags."
+      new_resource.updated_by_last_action(true)
+    end
+  end
+end
+
+action :change_password do
+  if user_exists?(new_resource.user)
+    cmdStr = "rabbitmqctl change_password #{new_resource.user} #{new_resource.password}"
+    execute cmdStr do
+      Chef::Log.debug "rabbitmq_user_change_password: #{cmdStr}"
+      Chef::Log.info "Editing RabbitMQ user '#{new_resource.user}'."
       new_resource.updated_by_last_action(true)
     end
   end
